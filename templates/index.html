@@ -1,0 +1,173 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Reminder
+{% endblock %}
+
+{% block main %}
+    <link href="/static/styles.css" rel="stylesheet">
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm8">
+                <div class="section">
+                    <h2 style="color: #67a8e0;"> {{ today_birthday }}</h2>
+                    <!-- https://m.669pic.com/sc/6017014.html -->
+                    <img alt="HappyDay" src="static/2.png" width="600" height="300">
+                    
+                </div>
+            </div>
+
+            <div class="col-sm4">
+                <link href="/static/styles3.css" rel="stylesheet">
+
+                    <div class="calendar">
+                        <div class="title">
+                            <h2 class="green" id="calendar-title">Month</h2>
+                            <h2 class="green small" id="calendar-year">Year</h2>
+                            <a href="" id="prev">Prev Month</a>
+                            <a href="" id="next">Next Month</a>
+                        </div>
+                        <div class="body">
+                            <div class="lightgrey body-list">
+                            <ul>
+                                <li>MON</li>
+                                <li>TUE</li>
+                                <li>WED</li>
+                                <li>THU</li>
+                                <li>FRI</li>
+                                <li>SAT</li>
+                                <li>SUN</li>
+                            </ul>
+                            </div>
+                            <div class="darkgrey body-list">
+                            <ul id="days">
+                            </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        // reference
+                        // https://zhuanlan.zhihu.com/p/26401052
+                        var olympic = [31,29,31,30,31,30,31,31,30,31,30,31];
+                        var normal = [31,28,31,30,31,30,31,31,30,31,30,31];
+                        var month_name = ["January","Febrary","March","April","May","June","July","Auguest","September","October","November","December"];
+
+                        var holder = document.getElementById("days");
+                        var prev = document.getElementById("prev");
+                        var next = document.getElementById("next");
+                        var ctitle = document.getElementById("calendar-title");
+                        var cyear = document.getElementById("calendar-year");
+
+                        var my_date = new Date();
+                        var my_year = my_date.getFullYear();
+                        var my_month = my_date.getMonth();
+                        var my_day = my_date.getDate();
+
+                        //Get the day of the week on the first day of the month 
+                        function dayStart(month, year) {
+                            var tmpDate = new Date(year, month, 1);
+                            return (tmpDate.getDay());
+                        }
+
+                        // olympic or not
+                        function daysMonth(month, year) {
+                            if (year % 4 == 0 & year % 100 != 0) {
+                                return (olympic[month]);
+                            } else if (year % 100 != 0 & year % 400 == 0){
+                                return (olympic[month]);
+                            } else {
+                                return (normal[month]);
+                            }
+                        }
+                        
+
+                        function refreshDate(){
+                            var info = "";
+                            var totalDay = daysMonth(my_month, my_year); //Get the total number of days in the month
+                            var firstDay = dayStart(my_month, my_year); 
+                            var myclass;
+                            for(var i=1; i<firstDay; i++){ 
+                                info += "<li></li>"; 
+                            }
+                            for(var i=1; i<=totalDay; i++){
+                                if((i<my_day && my_year==my_date.getFullYear() && my_month==my_date.getMonth()) || my_year<my_date.getFullYear() || ( my_year==my_date.getFullYear() && my_month<my_date.getMonth())){ 
+                                    myclass = " class='lightgrey'"; //before today grey
+                                }else if (i==my_day && my_year==my_date.getFullYear() && my_month==my_date.getMonth()){
+                                    myclass = " class='green greenbox'"; //today green
+                                }else{
+                                    myclass = " class='darkgrey'"; //after today
+                                }
+                                info += "<li"+myclass+">"+i+"</li>"; 
+                            }
+                            holder.innerHTML = info; //table of days
+                            ctitle.innerHTML = month_name[my_month]; //month
+                            cyear.innerHTML = my_year; //year
+                        }
+                        refreshDate(); 
+
+
+                        prev.onclick = function(e){
+                            e.preventDefault();
+                            my_month--;
+                            if(my_month<0){
+                                my_year--;
+                                my_month = 11;
+                            }
+                            refreshDate();
+                        }
+                        next.onclick = function(e){
+                            e.preventDefault();
+                            my_month++;
+                            if(my_month>11){
+                                my_year++;
+                                my_month = 0;
+                            }
+                            refreshDate();
+                        }
+
+                    </script>
+                </div>
+
+            </div>
+
+        <div class="section">
+            <p></p>
+            <p></p>
+            <p></p>
+            <div class="section">
+                    <h2>Add a Birthday</h2>
+                    <form action="/" method="post">
+                        <input name="Name" type="text" autocomplete="off" autofocus name="name" placeholder="Name">
+                        <input name="Month" type="text" autocomplete="off" autofocus name="month" placeholder="Month">
+                        <input name="Day" type="text" autocomplete="off" autofocus name="day" placeholder="Day">
+                        <input type="submit" value="Add Birthday" >
+                    </form>
+                </div>
+
+            <p></p>
+            <p></p>
+            <h2>All Birthdays</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Birthday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for each_data in birthday_data %}
+                    <tr>
+                        <td>{{ each_data.name }}</td>
+                        <td>{{ each_data.birthday }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+            
+    
+    </div>
+{% endblock %}
